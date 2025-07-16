@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINDbook - Lista Osób</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #18191a; /* Facebook-like dark background */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Zmienione na flex-start, aby kontener był na górze */
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #242526; /* Darker background for the main card */
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4); /* Subtle dark shadow */
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            margin-top: 20px; /* Dodatkowy margines na górze */
+        }
+        .findbook-logo {
+            font-family: 'Lato', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 900; /* Extra bold */
+            color: #1877f2; /* Facebook blue */
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3a3b3c; /* Darker separator */
+        }
+        .findbook-logo span {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+        h1 {
+            font-family: 'Lato', sans-serif;
+            font-size: 2rem;
+            font-weight: 700; /* Bold */
+            color: #e4e6eb; /* Light text color */
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3a3b3c; /* Darker separator */
+        }
+        .tabs-navigation {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #3a3b3c;
+        }
+        .tab-button {
+            background-color: transparent;
+            color: #e4e6eb;
+            padding: 10px 15px;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            flex-grow: 1;
+            text-align: center;
+            border-radius: 6px 6px 0 0; /* Zaokrąglone rogi na górze */
+        }
+        .tab-button:hover {
+            background-color: #3a3b3c;
+        }
+        .tab-button.active {
+            color: #1877f2; /* Facebook blue for active tab */
+            border-bottom-color: #1877f2;
+            background-color: #3a3b3c;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .name-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .name-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Rozłożenie elementów */
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            background-color: #3a3b3c; /* Darker item background */
+            border-radius: 6px;
+            transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-color 0.15s ease-in-out;
+            cursor: pointer;
+            font-weight: 700; /* Bold */
+            color: #e4e6eb; /* Light text color for items */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); /* Subtle dark shadow for each item */
+            border: 1px solid #3a3b3c; /* Default border color */
+        }
+        .name-item:hover {
+            background-color: #4e4f50; /* Lighter dark gray on hover */
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+            border-color: #1877f2; /* Facebook blue border on hover */
+        }
+        .name-item .name-text {
+            display: flex;
+            flex-grow: 1; /* Pozwala tekstowi zająć dostępną przestrzeń */
+            align-items: center;
+        }
+        .name-item .name-text span {
+            font-size: 1.1rem;
+            margin-right: 6px; /* Spacing between first and last name */
+            color: #e4e6eb; /* Light text color */
+        }
+        .name-item .name-text span:last-child {
+            margin-right: 0;
+        }
+
+        /* Checkmark Styles */
+        .checkmark-container {
+            width: 24px;
+            height: 24px;
+            margin-left: 10px;
+            position: relative;
+            cursor: pointer;
+        }
+        .checkmark-checkbox {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        .checkmark-label {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid #555; /* Default border for unchecked */
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .checkmark-icon {
+            fill: none; /* Default to no fill */
+            stroke: none; /* Default to no stroke */
+            width: 18px;
+            height: 18px;
+            transition: all 0.2s ease-in-out;
+        }
+        .checkmark-checkbox:checked + .checkmark-label {
+            background-color: #4CAF50; /* Green background when checked */
+            border-color: #4CAF50;
+        }
+        .checkmark-checkbox:checked + .checkmark-label .checkmark-icon {
+            fill: #fff; /* White checkmark when checked */
+            stroke: #fff;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Darker semi-transparent overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #242526; /* Darker background for modal content */
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid #3a3b3c; /* Subtle border */
+        }
+        .modal-content h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e4e6eb; /* Light text color */
+            margin-bottom: 20px;
+        }
+        .modal-buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .modal-button {
+            background-color: #1877f2; /* Facebook blue */
+            color: #ffffff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            border: 1px solid #1877f2; /* Blue border for buttons */
+            width: 100%;
+        }
+        .modal-button:hover {
+            background-color: #166fe5; /* Darker blue on hover */
+            border-color: #166fe5;
+        }
+        .modal-instagram-button {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); /* Instagram gradient */
+            color: #ffffff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s ease-in-out;
+            border: 1px solid #bc1888; /* Instagram-like border */
+            width: 100%;
+        }
+        .modal-instagram-button:hover {
+            opacity: 0.9;
+        }
+        .modal-close-button {
+            background-color: #3a3b3c; /* Dark gray for close button */
+            color: #e4e6eb; /* Light text color */
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            border: 1px solid #3a3b3c; /* Dark border */
+            margin-top: 15px;
+            width: 100%;
+        }
+        .modal-close-button:hover {
+            background-color: #4e4f50; /* Lighter dark gray on hover */
+            border-color: #4e4f50;
+        }
+
+        /* Saved Profiles Section (Main Tab) */
+        .add-profile-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #3a3b3c;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .profile-input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #555;
+            background-color: #3a3b3c;
+            color: #e4e6eb;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .profile-input::placeholder {
+            color: #bbb;
+        }
+        .add-profile-button {
+            background-color: #1877f2;
+            color: #ffffff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            border: none;
+        }
+        .add-profile-button:hover {
+            background-color: #166fe5;
+        }
+        .name-selection-for-link {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #3a3b3c;
+        }
+        .name-selection-for-link h3 {
+            color: #e4e6eb;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .name-selection-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 200px; /* Ograniczenie wysokości */
+            overflow-y: auto; /* Przewijanie */
+            border: 1px solid #3a3b3c;
+            border-radius: 6px;
+            background-color: #3a3b3c;
+        }
+        .name-selection-list li {
+            padding: 8px 12px;
+            color: #e4e6eb;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out;
+            border-bottom: 1px solid #4e4f50; /* Separator między imionami */
+        }
+        .name-selection-list li:last-child {
+            border-bottom: none;
+        }
+        .name-selection-list li:hover {
+            background-color: #4e4f50;
+        }
+
+        .saved-profiles-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .saved-profiles-list li {
+            background-color: #3a3b3c;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #3a3b3c;
+            transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+        }
+        .saved-profiles-list li:hover {
+            background-color: #4e4f50;
+            border-color: #e6683c; /* Instagram-like color on hover for saved profiles */
+        }
+        .saved-profiles-list a {
+            color: #e4e6eb; /* Light text color */
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.95rem;
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .saved-profiles-list a:hover {
+            text-decoration: underline;
+            color: #f09433; /* Instagram orange on hover */
+        }
+        .saved-profile-icon {
+            margin-left: 10px;
+            color: #f09433; /* Instagram orange for icon */
+        }
+
+        /* Modal specific saved profiles section */
+        .modal-saved-profiles-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #3a3b3c;
+            text-align: left;
+        }
+        .modal-saved-profiles-section h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #e4e6eb;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .modal-saved-profiles-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .modal-saved-profiles-list li {
+            background-color: #3a3b3c;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #3a3b3c;
+            transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+        }
+        .modal-saved-profiles-list li:hover {
+            background-color: #4e4f50;
+            border-color: #e6683c;
+        }
+        .modal-saved-profiles-list a {
+            color: #e4e6eb;
+            text-decoration: none;
+            font-weight: 400;
+            font-size: 0.95rem;
+            flex-grow: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .modal-saved-profiles-list a:hover {
+            text-decoration: underline;
+            color: #f09433;
+        }
+
+        @media (max-width: 640px) {
+            .findbook-logo {
+                font-size: 2.2rem;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+            .name-item span {
+                font-size: 1rem;
+            }
+            .modal-content {
+                padding: 15px;
+            }
+            .modal-content h2 {
+                font-size: 1.3rem;
+            }
+            .saved-profiles-list a, .modal-saved-profiles-list a {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="findbook-logo">FIND<span>book</span></div>
+
+        <div class="tabs-navigation">
+            <button id="mainListTab" class="tab-button active">Lista Osób</button>
+            <button id="savedProfilesTab" class="tab-button">Zapisane Profile</button>
+        </div>
+
+        <div id="mainListSection" class="content-section active">
+            <h1>Lista Osób</h1>
+            <ul class="name-list">
+                <!-- Data attributes for each person -->
+                <li class="name-item" data-full-name="Filip Bednarek" data-first-name="Filip" data-last-name="Bednarek" data-variations='["Filip"]' data-instagram-username="filip.bednarek">
+                    <div class="name-text">
+                        <span>Filip</span>
+                        <span>Bednarek</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-filip-bednarek">
+                        <label for="check-filip-bednarek" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Kamil Biernat" data-first-name="Kamil" data-last-name="Biernat" data-variations='["Kamil"]' data-instagram-username="kamil.biernat">
+                    <div class="name-text">
+                        <span>Kamil</span>
+                        <span>Biernat</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-kamil-biernat">
+                        <label for="check-kamil-biernat" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Maksymilian Bilecki" data-first-name="Maksymilian" data-last-name="Bilecki" data-variations='["Maksymilian", "Maks"]' data-instagram-username="maksymilian.b">
+                    <div class="name-text">
+                        <span>Maksymilian</span>
+                        <span>Bilecki</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-maksymilian-bilecki">
+                        <label for="check-maksymilian-bilecki" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Jan Brzęk" data-first-name="Jan" data-last-name="Brzęk" data-variations='["Jan", "Janek"]' data-instagram-username="jan.brzek">
+                    <div class="name-text">
+                        <span>Jan</span>
+                        <span>Brzęk</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-jan-brzek">
+                        <label for="check-jan-brzek" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Bartłomiej Burdak" data-first-name="Bartłomiej" data-last-name="Burdak" data-variations='["Bartłomiej", "Bartek"]' data-instagram-username="bartek.burdak">
+                    <div class="name-text">
+                        <span>Bartłomiej</span>
+                        <span>Burdak</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-bartlomiej-burdak">
+                        <label for="check-bartlomiej-burdak" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Tomasz Burghart" data-first-name="Tomasz" data-last-name="Burghart" data-variations='["Tomasz", "Tomek"]' data-instagram-username="tomek.burghart">
+                    <div class="name-text">
+                        <span>Tomasz</span>
+                        <span>Burghart</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-tomasz-burghart">
+                        <label for="check-tomasz-burghart" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Konrad Cudejko" data-first-name="Konrad" data-last-name="Cudejko" data-variations='["Konrad"]' data-instagram-username="konrad.c">
+                    <div class="name-text">
+                        <span>Konrad</span>
+                        <span>Cudejko</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-konrad-cudejko">
+                        <label for="check-konrad-cudejko" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Maksymilian Dębowski" data-first-name="Maksymilian" data-last-name="Dębowski" data-variations='["Maksymilian", "Maks"]' data-instagram-username="maks.d">
+                    <div class="name-text">
+                        <span>Maksymilian</span>
+                        <span>Dębowski</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-maksymilian-debowski">
+                        <label for="check-maksymilian-debowski" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Jakub Dominik" data-first-name="Jakub" data-last-name="Dominik" data-variations='["Jakub", "Kuba"]' data-instagram-username="jakub.dominik">
+                    <div class="name-text">
+                        <span>Jakub</span>
+                        <span>Dominik</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-jakub-dominik">
+                        <label for="check-jakub-dominik" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Ewelina Gajec" data-first-name="Ewelina" data-last-name="Gajec" data-variations='["Ewelina"]' data-instagram-username="ewelina.gajec">
+                    <div class="name-text">
+                        <span>Ewelina</span>
+                        <span>Gajec</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-ewelina-gajec">
+                        <label for="check-ewelina-gajec" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Rafał Góra" data-first-name="Rafał" data-last-name="Góra" data-variations='["Rafał"]' data-instagram-username="rafal.gora">
+                    <div class="name-text">
+                        <span>Rafał</span>
+                        <span>Góra</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-rafal-gora">
+                        <label for="check-rafal-gora" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Sylwia Guzik" data-first-name="Sylwia" data-last-name="Guzik" data-variations='["Sylwia"]' data-instagram-username="sylwia.g">
+                    <div class="name-text">
+                        <span>Sylwia</span>
+                        <span>Guzik</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-sylwia-guzik">
+                        <label for="check-sylwia-guzik" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Bernard Hnatów" data-first-name="Bernard" data-last-name="Hnatów" data-variations='["Bernard"]' data-instagram-username="bernard.h">
+                    <div class="name-text">
+                        <span>Bernard</span>
+                        <span>Hnatów</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-bernard-hnatow">
+                        <label for="check-bernard-hnatow" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Mikołaj Kobiałka" data-first-name="Mikołaj" data-last-name="Kobiałka" data-variations='["Mikołaj"]' data-instagram-username="mikolaj.k">
+                    <div class="name-text">
+                        <span>Mikołaj</span>
+                        <span>Kobiałka</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-mikolaj-kobialka">
+                        <label for="check-mikolaj-kobialka" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Emilia Kolasa" data-first-name="Emilia" data-last-name="Kolasa" data-variations='["Emilia"]' data-instagram-username="emilia.k">
+                    <div class="name-text">
+                        <span>Emilia</span>
+                        <span>Kolasa</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-emilia-kolasa">
+                        <label for="check-emilia-kolasa" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Maksymilian Konieczny" data-first-name="Maksymilian" data-last-name="Konieczny" data-variations='["Maksymilian", "Maks"]' data-instagram-username="maks.konieczny">
+                    <div class="name-text">
+                        <span>Maksymilian</span>
+                        <span>Konieczny</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-maksymilian-konieczny">
+                        <label for="check-maksymilian-konieczny" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Oliwier Koukakis" data-first-name="Oliwier" data-last-name="Koukakis" data-variations='["Oliwier"]' data-instagram-username="oliwier.k">
+                    <div class="name-text">
+                        <span>Oliwier</span>
+                        <span>Koukakis</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-oliwier-koukakis">
+                        <label for="check-oliwier-koukakis" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Artur Kowal" data-first-name="Artur" data-last-name="Kowal" data-variations='["Artur", "Artek"]' data-instagram-username="artur.kowal">
+                    <div class="name-text">
+                        <span>Artur</span>
+                        <span>Kowal</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-artur-kowal">
+                        <label for="check-artur-kowal" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Piotr Krawczyk" data-first-name="Piotr" data-last-name="Krawczyk" data-variations='["Piotr", "Piotrek"]' data-instagram-username="piotr.k">
+                    <div class="name-text">
+                        <span>Piotr</span>
+                        <span>Krawczyk</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-piotr-krawczyk">
+                        <label for="check-piotr-krawczyk" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Ksawery Kursa" data-first-name="Ksawery" data-last-name="Kursa" data-variations='["Ksawery"]' data-instagram-username="ksawery.k">
+                    <div class="name-text">
+                        <span>Ksawery</span>
+                        <span>Kursa</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-ksawery-kursa">
+                        <label for="check-ksawery-kursa" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Wojciech Maciaś" data-first-name="Wojciech" data-last-name="Maciaś" data-variations='["Wojciech", "Wojtek"]' data-instagram-username="wojciech.macias">
+                    <div class="name-text">
+                        <span>Wojciech</span>
+                        <span>Maciaś</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-wojciech-macias">
+                        <label for="check-wojciech-macias" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+                <li class="name-item" data-full-name="Dawid Maszewski" data-first-name="Dawid" data-last-name="Maszewski" data-variations='["Dawid"]' data-instagram-username="dawid.m">
+                    <div class="name-text">
+                        <span>Dawid</span>
+                        <span>Maszewski</span>
+                    </div>
+                    <div class="checkmark-container">
+                        <input type="checkbox" class="checkmark-checkbox" id="check-dawid-maszewski">
+                        <label for="check-dawid-maszewski" class="checkmark-label">
+                            <svg class="checkmark-icon" viewBox="0 0 24 24">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                            </svg>
+                        </label>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div id="savedProfilesSection" class="content-section">
+            <h2>Zapisane Profile</h2>
+            <div class="add-profile-section">
+                <input type="text" id="profileLinkInput" placeholder="Wklej link do profilu (FB/IG)" class="profile-input">
+                <button id="addProfileLinkButton" class="add-profile-button">Dodaj Link</button>
+            </div>
+            <div id="nameSelectionForLink" class="name-selection-for-link hidden">
+                <h3>Wybierz osobę z listy:</h3>
+                <ul id="nameSelectionList" class="name-selection-list">
+                    <!-- Names will be dynamically loaded here -->
+                </ul>
+            </div>
+            <ul id="savedProfilesListMain" class="saved-profiles-list">
+                <!-- Saved profiles will be rendered here -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Modal HTML Structure (for name variations and platform selection) -->
+    <div id="nameModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="modalTitle">Wybierz wariant imienia</h2>
+            <div id="modalButtonsContainer" class="modal-buttons-container">
+                <!-- Buttons for name variations or platform selection will be injected here by JavaScript -->
+            </div>
+
+            <!-- Saved profiles for the specific person in the modal -->
+            <div id="modalSavedProfilesSection" class="modal-saved-profiles-section hidden">
+                <h3>Zapisane profile dla tej osoby</h3>
+                <ul id="modalSavedProfilesList" class="modal-saved-profiles-list">
+                    <!-- Saved profiles for the current person will be injected here -->
+                </ul>
+            </div>
+
+            <button class="modal-close-button" onclick="closeModal()">Anuluj</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const mainListTab = document.getElementById('mainListTab');
+        const savedProfilesTab = document.getElementById('savedProfilesTab');
+        const mainListSection = document.getElementById('mainListSection');
+        const savedProfilesSection = document.getElementById('savedProfilesSection');
+        const nameItems = document.querySelectorAll('.name-item');
+        const nameModal = document.getElementById('nameModal');
+        const modalButtonsContainer = document.getElementById('modalButtonsContainer');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSavedProfilesSection = document.getElementById('modalSavedProfilesSection');
+        const modalSavedProfilesList = document.getElementById('modalSavedProfilesList');
+
+        const profileLinkInput = document.getElementById('profileLinkInput');
+        const addProfileLinkButton = document.getElementById('addProfileLinkButton');
+        const nameSelectionForLink = document.getElementById('nameSelectionForLink');
+        const nameSelectionList = document.getElementById('nameSelectionList');
+        const savedProfilesListMain = document.getElementById('savedProfilesListMain');
+
+        // Global variables for current state
+        let currentFullName = ''; // Dodane dla łatwiejszego filtrowania profili
+        let currentLastName = '';
+        let selectedFirstNameVariant = '';
+        let currentInstagramUsername = '';
+        let currentLinkToAdd = '';
+
+        // --- Local Storage Keys ---
+        const LOCAL_STORAGE_SAVED_PROFILES_KEY = 'findbook_saved_profiles';
+        const LOCAL_STORAGE_CHECKED_NAMES_KEY = 'findbook_checked_names';
+
+        // --- Data Storage (initialized from localStorage) ---
+        let savedProfiles = loadFromLocalStorage(LOCAL_STORAGE_SAVED_PROFILES_KEY) || [];
+        let checkedNames = loadFromLocalStorage(LOCAL_STORAGE_CHECKED_NAMES_KEY) || [];
+
+        // --- Helper Functions for Local Storage ---
+        function loadFromLocalStorage(key) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            } catch (e) {
+                console.error(`Error loading from localStorage for key "${key}":`, e);
+                return null;
+            }
+        }
+
+        function saveToLocalStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+            } catch (e) {
+                console.error(`Error saving to localStorage for key "${key}":`, e);
+            }
+        }
+
+        // --- Tab Switching Logic ---
+        mainListTab.addEventListener('click', () => {
+            mainListTab.classList.add('active');
+            savedProfilesTab.classList.remove('active');
+            mainListSection.classList.add('active');
+            savedProfilesSection.classList.remove('active');
+        });
+
+        savedProfilesTab.addEventListener('click', () => {
+            savedProfilesTab.classList.add('active');
+            mainListTab.classList.remove('active');
+            savedProfilesSection.classList.add('active');
+            mainListSection.classList.remove('active');
+            renderSavedProfilesMainTab(); // Renderuj zapisane profile po otwarciu zakładki
+        });
+
+        // --- Saved Profiles Tab Logic ---
+        function renderSavedProfilesMainTab() {
+            savedProfilesListMain.innerHTML = ''; // Wyczyść istniejącą listę
+
+            if (savedProfiles.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = "Brak zapisanych profili.";
+                li.style.color = '#e4e6eb';
+                li.style.textAlign = 'center';
+                savedProfilesListMain.appendChild(li);
+                return;
+            }
+
+            savedProfiles.forEach(profile => {
+                const li = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = profile.url;
+                link.target = "_blank"; // Otwórz w nowej karcie
+                link.textContent = `${profile.name} (${profile.platform})`;
+                li.appendChild(link);
+
+                const iconSpan = document.createElement('span');
+                iconSpan.classList.add('saved-profile-icon');
+                if (profile.platform === "Facebook") {
+                    iconSpan.textContent = "📘"; // Ikona Facebooka
+                } else if (profile.platform === "Instagram") {
+                    iconSpan.textContent = "📸"; // Ikona Instagrama
+                }
+                li.appendChild(iconSpan);
+
+                savedProfilesListMain.appendChild(li);
+            });
+        }
+
+        addProfileLinkButton.addEventListener('click', () => {
+            currentLinkToAdd = profileLinkInput.value.trim();
+            if (currentLinkToAdd) {
+                profileLinkInput.value = ''; // Wyczyść input
+                showNameSelectionForLink();
+            } else {
+                alert("Proszę wkleić link do profilu."); // Prosty alert
+            }
+        });
+
+        function showNameSelectionForLink() {
+            nameSelectionForLink.classList.remove('hidden');
+            nameSelectionList.innerHTML = '';
+
+            // Wypełnij listę wszystkimi imionami z głównej listy
+            const peopleData = [
+                { "full_name": "Filip Bednarek" },
+                { "full_name": "Kamil Biernat" },
+                { "full_name": "Maksymilian Bilecki" },
+                { "full_name": "Jan Brzęk" },
+                { "full_name": "Bartłomiej Burdak" },
+                { "full_name": "Tomasz Burghart" },
+                { "full_name": "Konrad Cudejko" },
+                { "full_name": "Maksymilian Dębowski" },
+                { "full_name": "Jakub Dominik" },
+                { "full_name": "Ewelina Gajec" },
+                { "full_name": "Rafał Góra" },
+                { "full_name": "Sylwia Guzik" },
+                { "full_name": "Bernard Hnatów" },
+                { "full_name": "Mikołaj Kobiałka" },
+                { "full_name": "Emilia Kolasa" },
+                { "full_name": "Maksymilian Konieczny" },
+                { "full_name": "Oliwier Koukakis" },
+                { "full_name": "Artur Kowal" },
+                { "full_name": "Piotr Krawczyk" },
+                { "full_name": "Ksawery Kursa" },
+                { "full_name": "Wojciech Maciaś" },
+                { "full_name": "Dawid Maszewski" }
+            ]; // Używamy tej listy, aby uniknąć pobierania z DOM
+
+            peopleData.forEach(person => {
+                const li = document.createElement('li');
+                li.textContent = person.full_name;
+                li.addEventListener('click', () => {
+                    addProfileToSaved(person.full_name, currentLinkToAdd);
+                    nameSelectionForLink.classList.add('hidden'); // Ukryj wybór po dodaniu
+                });
+                nameSelectionList.appendChild(li);
+            });
+        }
+
+        function addProfileToSaved(fullName, url) {
+            const platform = url.includes("facebook.com") ? "Facebook" : (url.includes("instagram.com") ? "Instagram" : "Inne");
+            savedProfiles.push({ name: fullName, url: url, platform: platform });
+            saveToLocalStorage(LOCAL_STORAGE_SAVED_PROFILES_KEY, savedProfiles);
+            renderSavedProfilesMainTab(); // Odśwież listę w zakładce zapisanych profili
+        }
+
+        // --- Checkmark Logic ---
+        function initializeCheckmarks() {
+            nameItems.forEach(item => {
+                const fullName = item.getAttribute('data-full-name');
+                const checkbox = item.querySelector('.checkmark-checkbox');
+                if (checkedNames.includes(fullName)) {
+                    checkbox.checked = true;
+                } else {
+                    checkbox.checked = false;
+                }
+
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked) {
+                        if (!checkedNames.includes(fullName)) {
+                            checkedNames.push(fullName);
+                        }
+                    } else {
+                        checkedNames = checkedNames.filter(name => name !== fullName);
+                    }
+                    saveToLocalStorage(LOCAL_STORAGE_CHECKED_NAMES_KEY, checkedNames);
+                });
+            });
+        }
+
+        // --- Main List Item Click (for modal) ---
+        nameItems.forEach(item => {
+            item.addEventListener('click', function(event) {
+                // Zapobiegaj otwieraniu modala, jeśli kliknięto na okejce
+                if (event.target.closest('.checkmark-container')) {
+                    return;
+                }
+
+                currentFullName = this.getAttribute('data-full-name'); // Przechowaj pełne imię i nazwisko
+                currentLastName = this.getAttribute('data-last-name');
+                const variationsJson = this.getAttribute('data-variations');
+                const variations = JSON.parse(variationsJson);
+                currentInstagramUsername = this.getAttribute('data-instagram-username');
+
+                showNameSelectionModal(variations);
+            });
+        });
+
+        // --- Modal Functions ---
+        function showNameSelectionModal(firstNameVariations) {
+            modalTitle.textContent = "Wybierz wariant imienia";
+            modalButtonsContainer.innerHTML = '';
+
+            firstNameVariations.forEach(firstNameVariant => {
+                const button = document.createElement('button');
+                button.classList.add('modal-button');
+                button.textContent = firstNameVariant;
+                button.onclick = () => showPlatformSelection(firstNameVariant);
+                modalButtonsContainer.appendChild(button);
+            });
+
+            // Ukryj sekcję zapisanych profili w modal początkowo
+            modalSavedProfilesSection.classList.add('hidden');
+            modalSavedProfilesList.innerHTML = '';
+
+            nameModal.classList.add('active');
+        }
+
+        function showPlatformSelection(chosenFirstNameVariant) {
+            selectedFirstNameVariant = chosenFirstNameVariant;
+
+            modalTitle.textContent = `Szukaj: ${selectedFirstNameVariant} ${currentLastName}`;
+            modalButtonsContainer.innerHTML = '';
+
+            // Przycisk wyszukiwania na Facebooku
+            const fbButton = document.createElement('button');
+            fbButton.classList.add('modal-button');
+            fbButton.textContent = `Szukaj na Facebooku`;
+            fbButton.onclick = () => performFacebookSearch(selectedFirstNameVariant, currentLastName);
+            modalButtonsContainer.appendChild(fbButton);
+
+            // Przycisk wyszukiwania na Instagramie (tylko jeśli nazwa użytkownika istnieje)
+            if (currentInstagramUsername) {
+                const igButton = document.createElement('button');
+                igButton.classList.add('modal-instagram-button');
+                igButton.textContent = `Szukaj na Instagramie`;
+                igButton.onclick = () => performInstagramSearch(selectedFirstNameVariant, currentLastName);
+                modalButtonsContainer.appendChild(igButton);
+            } else {
+                const noIgText = document.createElement('p');
+                noIgText.textContent = "Brak dostępnej nazwy użytkownika Instagram.";
+                noIgText.style.color = '#e4e6eb';
+                noIgText.style.fontSize = '0.9rem';
+                noIgText.style.marginTop = '10px';
+                modalButtonsContainer.appendChild(noIgText);
+            }
+
+            // Renderuj zapisane profile dla bieżącej osoby w modal
+            renderSavedProfilesInModal(currentFullName);
+        }
+
+        // Funkcja do renderowania zapisanych profili specjalnie w modal
+        function renderSavedProfilesInModal(personFullName) {
+            modalSavedProfilesList.innerHTML = ''; // Wyczyść poprzednią listę
+            // Upewnij się, że nagłówek jest tylko jeden i jest statyczny w HTML
+            // Jeśli chcesz dynamicznie dodawać nagłówek, musisz go najpierw usunąć, jeśli istnieje.
+            // Ponieważ nagłówek jest już w HTML, nie tworzymy go tutaj ponownie.
+
+            const filteredProfiles = savedProfiles.filter(profile => profile.name === personFullName);
+
+            if (filteredProfiles.length > 0) {
+                modalSavedProfilesSection.classList.remove('hidden'); // Pokaż sekcję
+                // Nie dodajemy nagłówka dynamicznie, ponieważ jest już w HTML
+                // const header = document.createElement('h3');
+                // header.textContent = "Zapisane profile dla tej osoby";
+                // header.style.textAlign = 'center';
+                // header.style.color = '#e4e6eb';
+                // header.style.fontSize = '1.2rem';
+                // header.style.fontWeight = '700';
+                // modalSavedProfilesSection.prepend(header); // Ta linia została usunięta
+
+                filteredProfiles.forEach(profile => {
+                    const li = document.createElement('li');
+                    const link = document.createElement('a');
+                    link.href = profile.url;
+                    link.target = "_blank";
+                    link.textContent = `${profile.name} (${profile.platform})`;
+                    li.appendChild(link);
+
+                    const iconSpan = document.createElement('span');
+                    iconSpan.classList.add('saved-profile-icon');
+                    if (profile.platform === "Facebook") {
+                        iconSpan.textContent = " ";
+                    } else if (profile.platform === "Instagram") {
+                        iconSpan.textContent = "📸";
+                    }
+                    li.appendChild(iconSpan);
+
+                    modalSavedProfilesList.appendChild(li);
+                });
+            } else {
+                modalSavedProfilesSection.classList.add('hidden'); // Ukryj, jeśli brak profili
+            }
+        }
+
+        function closeModal() {
+            nameModal.classList.remove('active');
+        }
+
+        // --- Search Functions ---
+        function performFacebookSearch(firstName, lastName) {
+            closeModal();
+            const fullName = `${firstName} ${lastName}`;
+            const encodedName = encodeURIComponent(fullName);
+            const facebookSearchUrl = `https://www.facebook.com/search/top/?q=${encodedName}`;
+            window.open(facebookSearchUrl, '_blank');
+        }
+
+        function performInstagramSearch(firstName, lastName) {
+            closeModal();
+            const fullName = `${firstName} ${lastName}`;
+
+            // Kopiuj do schowka
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = fullName;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            try {
+                document.execCommand('copy');
+                // Możesz dodać tymczasowy komunikat dla użytkownika, np. mały div z napisem "Skopiowano!"
+                console.log('Imię i nazwisko skopiowane do schowka: ' + fullName);
+            } catch (err) {
+                console.error('Nie udało się skopiować do schowka: ', err);
+            }
+            document.body.removeChild(tempTextArea);
+
+            // Przekieruj do ogólnej strony wyszukiwania na Instagramie
+            const instagramSearchUrl = `https://www.instagram.com/explore/people/search/?q=${encodeURIComponent(fullName)}`;
+            window.open(instagramSearchUrl, '_blank');
+        }
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCheckmarks();
+            renderSavedProfilesMainTab(); // Renderuj zapisane profile przy początkowym ładowaniu zakładki
+        });
+    </script>
+</body>
+</html>
+ 
